@@ -1,17 +1,11 @@
 # AntiFraud Platform - Link Check Module
 
-Этот проект содержит **модуль проверки ссылок (Link Check)** с интеграцией AI для определения фишинговых и мошеннических сайтов. 
-
-**🎯 Фокус проекта**: Проверка ссылок с помощью AI (OpenRouter + Google AI)
-
-Модуль использует OpenRouter AI (приоритет) и Google AI (fallback) для детального анализа безопасности URL. Все API ключи уже настроены и готовы к использованию.
-
-> 💡 **Важно**: Этот модуль полностью самодостаточен. Вы можете использовать **только функцию проверки ссылок**, игнорируя остальные функции проекта. См. `LINK_CHECK_ONLY.md` и `STANDALONE_USAGE.md` для деталей.
+Модуль проверки ссылок с использованием AI (OpenRouter + Google AI) для определения фишинговых и мошеннических сайтов.
 
 ## 🎯 Основная функциональность
 
 **Проверка ссылок (Link Check)** - главная функция проекта:
-- ✅ Полный AI-аудит сайтов через OpenRouter (модель `xiaomi/mimo-v2-flash:free`)
+- ✅ Полный AI-аудит сайтов через OpenRouter AI (приоритет)
 - ✅ Автоматический fallback на Google AI при недоступности OpenRouter
 - ✅ Анализ URL, TLS сертификатов, DNS информации, возраста домена
 - ✅ Проверка HTML/JS структуры, контента и опасного поведения
@@ -31,8 +25,8 @@
 ### 1. Клонирование репозитория
 
 ```bash
-git clone <repository-url>
-cd Project_Gos
+git clone https://github.com/NURJAKS/Gos-project.git
+cd Gos-project
 ```
 
 ### 2. Установка PHP зависимостей
@@ -119,7 +113,7 @@ Python Script: python_scripts/phishguard_audit.py
     ↓
 ai_analyzer.py::analyze_url_full_audit()
     ↓
-OpenRouter AI API (Primary) / Google AI (Fallback)
+OpenRouter AI API (Primary) → Google AI (Fallback)
 ```
 
 ### Процесс проверки
@@ -131,7 +125,7 @@ OpenRouter AI API (Primary) / Google AI (Fallback)
 
 2. **AI-анализ**:
    - Отправка данных в OpenRouter AI (приоритет)
-   - Если OpenRouter недоступен → автоматический переход на Google AI
+   - Если OpenRouter недоступен (401, 503, 429) → автоматический переход на Google AI
    - Анализ всех аспектов безопасности
 
 3. **Классификация**:
@@ -147,7 +141,7 @@ OpenRouter AI API (Primary) / Google AI (Fallback)
 ## 📁 Структура проекта (важные файлы)
 
 ```
-Project_Gos/
+Gos-project/
 ├── app/
 │   ├── Http/Controllers/
 │   │   └── CheckController.php          # Контроллер проверки ссылок
@@ -158,15 +152,15 @@ Project_Gos/
 │   ├── ai_analyzer.py                   # AI анализ через OpenRouter/Google
 │   ├── domain_info.py                   # Анализ домена (DNS, TLS, возраст)
 │   ├── rules.json                       # Правила blacklist/whitelist
-│   └── official_sources.json            # База официальных источников
+│   ├── official_sources.json             # База официальных источников
+│   └── requirements.txt                 # Python зависимости
 ├── resources/views/check/
 │   └── link.blade.php                   # Frontend страница проверки ссылок
 ├── routes/
 │   └── web.php                          # Маршруты (GET/POST /check/link)
 ├── config/
 │   └── services.php                     # Конфигурация API ключей
-├── .env                                  # Переменные окружения (включен в репозиторий)
-└── requirements.txt                     # Python зависимости
+└── .env                                  # Переменные окружения (включен в репозиторий)
 ```
 
 ## 🔑 API Ключи
@@ -176,6 +170,8 @@ Project_Gos/
 - **OPENROUTER_API_KEY**: `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`
 - **OPENROUTER_MODEL**: `xiaomi/mimo-v2-flash:free` (бесплатная модель)
 - **GOOGLE_API_KEY**: `AIzaSyBFvQQz_PQdg4jTpwefpfPuiAyV7OMT9aw` (fallback)
+
+> ⚠️ **Важно**: Если OpenRouter ключ недействителен (401), система автоматически переключится на Google AI.
 
 ## 🔌 Интеграция в существующий проект
 
@@ -189,6 +185,7 @@ cp app/Services/PhishGuardService.php <your-project>/app/Services/
 
 # Контроллер (или добавьте метод checkLink в существующий)
 cp app/Http/Controllers/CheckController.php <your-project>/app/Http/Controllers/
+# Метод: checkLink() - строки ~376-566
 
 # Python скрипты
 cp -r python_scripts/ <your-project>/
@@ -205,6 +202,8 @@ cp resources/views/check/link.blade.php <your-project>/resources/views/check/
 В `routes/web.php`:
 
 ```php
+use App\Http\Controllers\CheckController;
+
 Route::get('/check/link', [CheckController::class, 'link'])->name('check.link');
 Route::post('/check/link', [CheckController::class, 'checkLink'])->name('check.link.perform');
 ```
@@ -227,12 +226,35 @@ GOOGLE_API_KEY=AIzaSyBFvQQz_PQdg4jTpwefpfPuiAyV7OMT9aw
 
 ### 5. Обновите config/services.php
 
+Добавьте секцию:
+
 ```php
 'openrouter' => [
     'key' => env('OPENROUTER_API_KEY', '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'),
     'api_key' => env('OPENROUTER_API_KEY', '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'),
 ],
 ```
+
+### 6. Права доступа
+
+```bash
+chmod +x python_scripts/phishguard_audit.py
+```
+
+### 7. Очистка кеша
+
+```bash
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+```
+
+## ✅ Проверка работы
+
+1. Запустите сервер: `php artisan serve --port=8003`
+2. Откройте: `http://localhost:8003/check/link`
+3. Введите URL и нажмите "Проверить ссылку"
+4. Дождитесь результатов
 
 ## 🧪 Тестирование
 
@@ -278,6 +300,16 @@ APP_PORT=8003
 
 ## 🐛 Решение проблем
 
+### Ошибка "401 Unauthorized" от OpenRouter
+
+Если OpenRouter ключ недействителен, система автоматически переключится на Google AI. Если хотите использовать новый OpenRouter ключ:
+
+1. Получите новый ключ на https://openrouter.ai/keys
+2. Обновите в `.env`:
+   ```env
+   OPENROUTER_API_KEY=ваш_новый_ключ
+   ```
+
 ### Ошибка "OPENROUTER_API_KEY не настроен"
 
 Проверьте, что в `.env` файле есть ключ `OPENROUTER_API_KEY`.
@@ -285,6 +317,7 @@ APP_PORT=8003
 ### Ошибка "PhishGuard скрипт не найден"
 
 Убедитесь, что файл `python_scripts/phishguard_audit.py` существует и имеет права на выполнение:
+
 ```bash
 chmod +x python_scripts/phishguard_audit.py
 ```
@@ -292,6 +325,7 @@ chmod +x python_scripts/phishguard_audit.py
 ### Ошибка "ModuleNotFoundError: No module named 'requests'"
 
 Установите Python зависимости:
+
 ```bash
 source venv/bin/activate
 pip install -r python_scripts/requirements.txt
@@ -315,7 +349,14 @@ pip install -r python_scripts/requirements.txt
 - **OpenRouter**: Бесплатная модель `xiaomi/mimo-v2-flash:free` имеет лимиты на количество запросов
 - **Google AI**: 20 запросов/день для бесплатного тарифа
 
-При исчерпании лимитов система автоматически переключается на fallback или показывает понятное сообщение об ошибке.
+При исчерпании лимитов или ошибках (401, 503, 429) система автоматически переключается на fallback или показывает понятное сообщение об ошибке.
+
+### Автоматический Fallback
+
+Система автоматически переключается между AI провайдерами:
+1. **OpenRouter** (приоритет) - если доступен
+2. **Google AI** (fallback) - если OpenRouter недоступен (401, 503, 429)
+3. **Базовая проверка** (blacklist/whitelist) - если оба AI недоступны
 
 ## 📄 Лицензия
 

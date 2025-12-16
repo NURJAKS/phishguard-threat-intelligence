@@ -561,12 +561,21 @@ def analyze_url_full_audit(url: str) -> Dict[str, Any]:
     # Выполняем полный AI аудит через OpenRouter (приоритет) или Google (fallback)
     result = _openrouter_full_audit(audit_data, url)
     
-    # Если OpenRouter не сработал, пробуем Google
+    # Если OpenRouter не сработал (ошибка 401, 429, 503 и т.д.), пробуем Google
     if result.get('error'):
-        logger.warning("[FULL AUDIT] OpenRouter failed, trying Google AI as fallback...")
+        error_msg = result.get('error', '')
+        # Для 401 (неверный ключ) всегда переключаемся на Google
+        if '401' in error_msg or 'Unauthorized' in error_msg:
+            logger.warning("[FULL AUDIT] OpenRouter API key invalid (401), switching to Google AI...")
+        else:
+            logger.warning("[FULL AUDIT] OpenRouter failed, trying Google AI as fallback...")
+        
         google_result = _google_ai_full_audit(audit_data, url)
         if not google_result.get('error'):
             return google_result
+        # Если Google тоже не сработал, возвращаем ошибку OpenRouter с пометкой о fallback
+        if '401' in error_msg:
+            return {"error": "OpenRouter API ключ недействителен. Google AI также недоступен. Проверьте настройки API ключей."}
     
     return result
 
@@ -574,10 +583,16 @@ def analyze_url_full_audit(url: str) -> Dict[str, Any]:
 def _openrouter_full_audit(audit_data: Dict[str, Any], url: str) -> Dict[str, Any]:
     """Полный анти-фишинговый аудит через OpenRouter"""
     try:
-        api_key = os.getenv("OPENROUTER_API_KEY", DEFAULT_OPENROUTER_API_KEY)
-        if not api_key:
+        # Сначала пробуем получить из переменной окружения, затем используем default
+        api_key = os.getenv("OPENROUTER_API_KEY") or DEFAULT_OPENROUTER_API_KEY
+        if not api_key or api_key == "":
             logger.warning("[FULL AUDIT] OPENROUTER_API_KEY not set")
             return {"error": "OpenRouter API ключ не настроен"}
+        
+        # Проверяем, что ключ не является placeholder
+        if "YOUR_" in api_key or len(api_key) < 20:
+            logger.warning("[FULL AUDIT] OPENROUTER_API_KEY appears to be invalid")
+            return {"error": "OpenRouter API ключ недействителен"}
         
         model = os.getenv("OPENROUTER_MODEL", DEFAULT_OPENROUTER_MODEL)
         logger.info(f"[FULL AUDIT] Using OpenRouter (model: {model})")
@@ -787,6 +802,10 @@ def _openrouter_full_audit(audit_data: Dict[str, Any], url: str) -> Dict[str, An
     except Exception as e:
         error_str = str(e)
         logger.error(f"[FULL AUDIT] Error: {error_str}")
+        
+        # Обработка ошибки 401 (неверный ключ)
+        if "401" in error_str or "Unauthorized" in error_str or "User not found" in error_str:
+            return {"error": "401 UNAUTHORIZED. OpenRouter API ключ недействителен или истек. Система автоматически переключится на Google AI."}
         
         # Извлекаем время ожидания из ошибки 429
         if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str or "quota" in error_str.lower():

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class PhishGuardService
 {
-    private string $apiUrl;
+    private string $apiUrl = '';
     private bool $isConfigured;
 
     public function __construct()
@@ -16,6 +16,8 @@ class PhishGuardService
         // Проверяем наличие Python скрипта
         $scriptPath = base_path('python_scripts/phishguard_audit.py');
         $this->isConfigured = file_exists($scriptPath);
+        // apiUrl не используется, но инициализируем для совместимости со старыми методами
+        $this->apiUrl = env('PHISHGUARD_API_URL', 'http://localhost:8002');
     }
 
     public function isConfigured(): bool
@@ -24,28 +26,63 @@ class PhishGuardService
     }
 
     /**
-     * Проверка URL через PhishGuard API
+     * Проверка URL через базовые правила (blacklist/whitelist)
+     * Теперь работает локально через Python скрипты, не требует HTTP API
      */
     public function checkUrl(string $url): array
     {
         if (!$this->isConfigured()) {
-            throw new \Exception('PhishGuard API не настроен. Укажите PHISHGUARD_API_URL в .env');
+            throw new \Exception('PhishGuard не настроен. Убедитесь, что python_scripts/phishguard_audit.py существует');
         }
 
         try {
-            Log::info("PhishGuard: Checking URL: {$url}");
+            Log::info("PhishGuard: Basic check for URL: {$url}");
 
-            $response = Http::timeout(30)->post("{$this->apiUrl}/v1/check/url", [
-                'url' => $url,
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                Log::info("PhishGuard: Response received", ['action' => $data['action'] ?? 'unknown']);
-                return $data;
+            // Загружаем правила локально
+            $rulesPath = base_path('python_scripts/rules.json');
+            if (!file_exists($rulesPath)) {
+                return [
+                    'action' => 'unknown',
+                    'score' => 0.5,
+                    'reason' => 'Правила проверки не найдены'
+                ];
             }
 
-            throw new \Exception("PhishGuard API error: HTTP {$response->status()}");
+            $rules = json_decode(file_get_contents($rulesPath), true);
+            $domain = parse_url($url, PHP_URL_HOST);
+            
+            // Проверка blacklist
+            if (isset($rules['blacklist_domains'])) {
+                foreach ($rules['blacklist_domains'] as $blacklisted) {
+                    if (strpos($domain, $blacklisted) !== false) {
+                        return [
+                            'action' => 'block',
+                            'score' => 1.0,
+                            'reason' => 'Домен в черном списке'
+                        ];
+                    }
+                }
+            }
+
+            // Проверка whitelist
+            if (isset($rules['whitelist_domains'])) {
+                foreach ($rules['whitelist_domains'] as $whitelisted) {
+                    if (strpos($domain, $whitelisted) !== false) {
+                        return [
+                            'action' => 'allow',
+                            'score' => 0.0,
+                            'reason' => 'Домен в белом списке'
+                        ];
+                    }
+                }
+            }
+
+            // По умолчанию - неизвестно, нужен AI анализ
+            return [
+                'action' => 'unknown',
+                'score' => 0.5,
+                'reason' => 'URL выглядит безопасно'
+            ];
         } catch (\Exception $e) {
             Log::error("PhishGuard check error: " . $e->getMessage());
             throw $e;
@@ -296,20 +333,12 @@ class PhishGuardService
     }
 
     /**
-     * Проверка здоровья API
+     * Проверка здоровья (теперь проверяем наличие Python скрипта)
      */
     public function healthCheck(): bool
     {
-        if (!$this->isConfigured()) {
-            return false;
-        }
-
-        try {
-            $response = Http::timeout(5)->get("{$this->apiUrl}/health");
-            return $response->successful();
-        } catch (\Exception $e) {
-            return false;
-        }
+        // Проверяем наличие Python скрипта вместо HTTP API
+        return $this->isConfigured();
     }
 
     /**

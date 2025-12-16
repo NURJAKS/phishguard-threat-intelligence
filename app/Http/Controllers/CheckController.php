@@ -474,18 +474,27 @@ class CheckController extends Controller
                     $errorMsg = $fullAudit['error'];
                     Log::warning('AI audit failed or returned error: ' . $errorMsg . ', using basic check');
                     
+                    // Проверяем, является ли это ошибкой 401 (неверный ключ OpenRouter)
+                    $is401Error = strpos($errorMsg, '401') !== false || strpos($errorMsg, 'Unauthorized') !== false;
+                    
                     // Используем базовую классификацию, если она есть
                     if (isset($basicClassification)) {
                         $classification = $basicClassification;
-                        // Добавляем пометку, что использована базовая проверка
-                        $classification['reason'] = ($classification['reason'] ?? '') . ' (Детальный AI-анализ временно недоступен)';
+                        // Добавляем пометку об ошибке
+                        if ($is401Error) {
+                            $classification['reason'] = ($classification['reason'] ?? '') . ' (OpenRouter API ключ недействителен, используется базовая проверка)';
+                        } else {
+                            $classification['reason'] = ($classification['reason'] ?? '') . ' (Детальный AI-анализ временно недоступен)';
+                        }
                     } else {
                         $classification = [
                             'verdict' => 'unknown',
                             'label' => 'Не удалось проверить',
                             'action' => 'unknown',
                             'score' => 0.5,
-                            'reason' => 'AI-анализ недоступен: ' . $errorMsg
+                            'reason' => $is401Error 
+                                ? 'OpenRouter API ключ недействителен. Проверьте настройки в .env файле.'
+                                : 'AI-анализ недоступен: ' . $errorMsg
                         ];
                     }
                 } else {
