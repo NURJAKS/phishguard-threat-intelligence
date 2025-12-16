@@ -13,6 +13,7 @@ Route::post('/check/listing', [CheckController::class, 'checkListing'])->name('c
 Route::get('/check/image', [CheckController::class, 'image'])->name('check.image');
 Route::post('/check/image', [CheckController::class, 'checkImage'])->name('check.image.perform');
 Route::get('/check/link', [CheckController::class, 'link'])->name('check.link');
+Route::post('/check/link', [CheckController::class, 'checkLink'])->name('check.link.perform');
 
 Route::get('/connections', [CheckController::class, 'connections'])->name('connections');
 Route::get('/profile', [CheckController::class, 'profile'])->name('profile');

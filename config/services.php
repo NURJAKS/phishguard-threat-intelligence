@@ -36,7 +36,13 @@ return [
     ],
 
     'gemini' => [
-        'api_key' => env('GEMINI_API_KEY', 'AIzaSyCuSqkI9RHVFoYIurqfkmQUoMgkl7Ct8o4'),
+        'key' => env('GOOGLE_API_KEY', env('GEMINI_API_KEY', 'AIzaSyBFvQQz_PQdg4jTpwefpfPuiAyV7OMT9aw')),
+        'api_key' => env('GOOGLE_API_KEY', env('GEMINI_API_KEY', 'AIzaSyBFvQQz_PQdg4jTpwefpfPuiAyV7OMT9aw')),
+    ],
+
+    'openrouter' => [
+        'key' => env('OPENROUTER_API_KEY', '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'),
+        'api_key' => env('OPENROUTER_API_KEY', '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'),
     ],
 
 ];

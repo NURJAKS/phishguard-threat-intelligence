@@ -1,59 +1,330 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# AntiFraud Platform - Link Check Module
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Этот проект содержит **модуль проверки ссылок (Link Check)** с интеграцией AI для определения фишинговых и мошеннических сайтов. 
 
-## About Laravel
+**🎯 Фокус проекта**: Проверка ссылок с помощью AI (OpenRouter + Google AI)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Модуль использует OpenRouter AI (приоритет) и Google AI (fallback) для детального анализа безопасности URL. Все API ключи уже настроены и готовы к использованию.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+> 💡 **Важно**: Этот модуль полностью самодостаточен. Вы можете использовать **только функцию проверки ссылок**, игнорируя остальные функции проекта. См. `LINK_CHECK_ONLY.md` и `STANDALONE_USAGE.md` для деталей.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🎯 Основная функциональность
 
-## Learning Laravel
+**Проверка ссылок (Link Check)** - главная функция проекта:
+- ✅ Полный AI-аудит сайтов через OpenRouter (модель `xiaomi/mimo-v2-flash:free`)
+- ✅ Автоматический fallback на Google AI при недоступности OpenRouter
+- ✅ Анализ URL, TLS сертификатов, DNS информации, возраста домена
+- ✅ Проверка HTML/JS структуры, контента и опасного поведения
+- ✅ Базовая проверка по blacklist/whitelist правилам
+- ✅ Понятные результаты на русском языке простыми словами
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 📋 Требования
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **PHP**: >= 8.2
+- **Composer**: последняя версия
+- **Node.js**: >= 18.x и npm
+- **Python**: >= 3.8
+- **Операционная система**: Linux, macOS или WSL на Windows
 
-## Laravel Sponsors
+## 🚀 Установка
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 1. Клонирование репозитория
 
-### Premium Partners
+```bash
+git clone <repository-url>
+cd Project_Gos
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 2. Установка PHP зависимостей
 
-## Contributing
+```bash
+composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Настройка окружения
 
-## Code of Conduct
+Файл `.env` уже включен в репозиторий с необходимыми ключами. Если нужно сгенерировать новый APP_KEY:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+### 4. Установка Node.js зависимостей
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+npm install
+npm run build
+```
 
-## License
+### 5. Установка Python зависимостей
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Создайте виртуальное окружение и установите зависимости:
+
+```bash
+# Создание виртуального окружения
+python3 -m venv venv
+
+# Активация виртуального окружения
+source venv/bin/activate  # Linux/macOS
+# или
+venv\Scripts\activate  # Windows
+
+# Установка зависимостей
+pip install -r python_scripts/requirements.txt
+```
+
+### 6. Настройка прав доступа
+
+```bash
+chmod +x python_scripts/phishguard_audit.py
+```
+
+## ▶️ Запуск проекта
+
+### Запуск Laravel сервера
+
+```bash
+php artisan serve --host=0.0.0.0 --port=8003
+```
+
+Или используйте встроенный скрипт:
+
+```bash
+composer run dev
+```
+
+### Доступ к приложению
+
+Откройте в браузере: `http://localhost:8003`
+
+### Проверка ссылок
+
+1. Перейдите на страницу: `http://localhost:8003/check/link`
+2. Введите URL или домен для проверки
+3. Нажмите "Проверить ссылку"
+4. Дождитесь результатов анализа
+
+## 🔧 Как это работает
+
+### Архитектура
+
+```
+Laravel Frontend (PHP)
+    ↓
+CheckController::checkLink()
+    ↓
+PhishGuardService::fullAudit()
+    ↓
+Python Script: python_scripts/phishguard_audit.py
+    ↓
+ai_analyzer.py::analyze_url_full_audit()
+    ↓
+OpenRouter AI API (Primary) / Google AI (Fallback)
+```
+
+### Процесс проверки
+
+1. **Сбор данных**:
+   - Загрузка HTML страницы
+   - Извлечение JavaScript URL
+   - Анализ домена (DNS, TLS, возраст)
+
+2. **AI-анализ**:
+   - Отправка данных в OpenRouter AI (приоритет)
+   - Если OpenRouter недоступен → автоматический переход на Google AI
+   - Анализ всех аспектов безопасности
+
+3. **Классификация**:
+   - Безопасно / Подозрительно / Опасно
+   - Вероятность фишинга (0-100%)
+   - Детальное объяснение простыми словами
+
+4. **Результат**:
+   - Отображение в удобном формате
+   - Детальный анализ по категориям
+   - Рекомендации по безопасности
+
+## 📁 Структура проекта (важные файлы)
+
+```
+Project_Gos/
+├── app/
+│   ├── Http/Controllers/
+│   │   └── CheckController.php          # Контроллер проверки ссылок
+│   └── Services/
+│       └── PhishGuardService.php        # Сервис для работы с PhishGuard
+├── python_scripts/
+│   ├── phishguard_audit.py              # Главный скрипт для вызова из PHP
+│   ├── ai_analyzer.py                   # AI анализ через OpenRouter/Google
+│   ├── domain_info.py                   # Анализ домена (DNS, TLS, возраст)
+│   ├── rules.json                       # Правила blacklist/whitelist
+│   └── official_sources.json            # База официальных источников
+├── resources/views/check/
+│   └── link.blade.php                   # Frontend страница проверки ссылок
+├── routes/
+│   └── web.php                          # Маршруты (GET/POST /check/link)
+├── config/
+│   └── services.php                     # Конфигурация API ключей
+├── .env                                  # Переменные окружения (включен в репозиторий)
+└── requirements.txt                     # Python зависимости
+```
+
+## 🔑 API Ключи
+
+Все ключи уже настроены в `.env` файле:
+
+- **OPENROUTER_API_KEY**: `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`
+- **OPENROUTER_MODEL**: `xiaomi/mimo-v2-flash:free` (бесплатная модель)
+- **GOOGLE_API_KEY**: `AIzaSyBFvQQz_PQdg4jTpwefpfPuiAyV7OMT9aw` (fallback)
+
+## 🔌 Интеграция в существующий проект
+
+Если вы хотите интегрировать этот модуль проверки ссылок в свой существующий Laravel проект:
+
+### 1. Скопируйте файлы
+
+```bash
+# Сервис
+cp app/Services/PhishGuardService.php <your-project>/app/Services/
+
+# Контроллер (или добавьте метод checkLink в существующий)
+cp app/Http/Controllers/CheckController.php <your-project>/app/Http/Controllers/
+
+# Python скрипты
+cp -r python_scripts/ <your-project>/
+
+# View
+cp resources/views/check/link.blade.php <your-project>/resources/views/check/
+
+# Конфигурация
+# Добавьте в config/services.php секцию 'openrouter'
+```
+
+### 2. Добавьте маршруты
+
+В `routes/web.php`:
+
+```php
+Route::get('/check/link', [CheckController::class, 'link'])->name('check.link');
+Route::post('/check/link', [CheckController::class, 'checkLink'])->name('check.link.perform');
+```
+
+### 3. Установите Python зависимости
+
+```bash
+pip install -r python_scripts/requirements.txt
+```
+
+### 4. Настройте .env
+
+Добавьте в ваш `.env`:
+
+```env
+OPENROUTER_API_KEY=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
+OPENROUTER_MODEL=xiaomi/mimo-v2-flash:free
+GOOGLE_API_KEY=AIzaSyBFvQQz_PQdg4jTpwefpfPuiAyV7OMT9aw
+```
+
+### 5. Обновите config/services.php
+
+```php
+'openrouter' => [
+    'key' => env('OPENROUTER_API_KEY', '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'),
+    'api_key' => env('OPENROUTER_API_KEY', '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'),
+],
+```
+
+## 🧪 Тестирование
+
+### Тест через командную строку
+
+```bash
+# Активация виртуального окружения
+source venv/bin/activate
+
+# Прямой вызов Python скрипта
+python3 python_scripts/phishguard_audit.py "https://google.com" "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"
+```
+
+### Тест через Laravel Tinker
+
+```bash
+php artisan tinker
+
+$service = app(\App\Services\PhishGuardService::class);
+$result = $service->fullAudit('https://google.com');
+print_r($result);
+```
+
+## 📝 Конфигурация
+
+### Изменение модели AI
+
+В `.env` измените:
+
+```env
+OPENROUTER_MODEL=xiaomi/mimo-v2-flash:free
+```
+
+Доступные бесплатные модели можно посмотреть на: https://openrouter.ai/models
+
+### Изменение порта
+
+В `.env`:
+
+```env
+APP_PORT=8003
+```
+
+## 🐛 Решение проблем
+
+### Ошибка "OPENROUTER_API_KEY не настроен"
+
+Проверьте, что в `.env` файле есть ключ `OPENROUTER_API_KEY`.
+
+### Ошибка "PhishGuard скрипт не найден"
+
+Убедитесь, что файл `python_scripts/phishguard_audit.py` существует и имеет права на выполнение:
+```bash
+chmod +x python_scripts/phishguard_audit.py
+```
+
+### Ошибка "ModuleNotFoundError: No module named 'requests'"
+
+Установите Python зависимости:
+```bash
+source venv/bin/activate
+pip install -r python_scripts/requirements.txt
+```
+
+### Python скрипт не выполняется
+
+Проверьте путь к Python в `PhishGuardService.php`. По умолчанию используется `python3` или `venv/bin/python3`.
+
+## 📚 Дополнительная информация
+
+### Используемые технологии
+
+- **Backend**: Laravel 12.x (PHP 8.2+)
+- **Frontend**: Blade templates, TailwindCSS
+- **AI**: OpenRouter API (приоритет), Google Gemini (fallback)
+- **Python**: requests, beautifulsoup4, google-genai, dnspython
+
+### Лимиты API
+
+- **OpenRouter**: Бесплатная модель `xiaomi/mimo-v2-flash:free` имеет лимиты на количество запросов
+- **Google AI**: 20 запросов/день для бесплатного тарифа
+
+При исчерпании лимитов система автоматически переключается на fallback или показывает понятное сообщение об ошибке.
+
+## 📄 Лицензия
+
+MIT License
+
+## 👥 Авторы
+
+Этот модуль проверки ссылок был разработан для интеграции в основной проект AntiFraud Platform.
+
+---
+
+**Важно**: Этот проект сфокусирован на функции проверки ссылок. Другие функции (проверка номеров, изображений и т.д.) могут быть в основном проекте.

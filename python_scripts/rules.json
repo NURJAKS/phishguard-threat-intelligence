@@ -1,0 +1,23 @@
+{
+  "blacklist_domains": [
+    "cyber-police-detailed-test.com",
+    "baikonurmed.kz",
+    "z.kyz2dar-cia.net",
+    "kyz7dar-xbf.net"
+  ],
+  "whitelist_domains": [
+    "bankffin-kz.netlify.app",
+    "test-whitelist-example.com",
+    "halykbank-kz.netlify.app",
+    "egov.kz",
+    "www.egov.kz",
+    "gov.kz",
+    "www.gov.kz"
+  ],
+  "suspicious_keywords": [],
+  "trusted_domains": [],
+  "suspicious_tlds": [],
+  "http_allowlist": [
+    "localhost"
+  ]
+}
