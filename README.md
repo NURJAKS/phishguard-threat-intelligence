@@ -1,15 +1,101 @@
-# 🔒 Сканер ссылок на безопасность
+# 🔒 Link Scanner - Сканер ссылок на безопасность
 
-Минималистичный инструмент для проверки безопасности ссылок с использованием AI (OpenRouter + Google AI).
+**Link Scanner** — это минималистичный веб-инструмент для проверки безопасности URL с использованием искусственного интеллекта. Система анализирует ссылки на предмет фишинга, мошенничества и других угроз безопасности.
 
-## 🎯 Функциональность
+## 🎯 Что это такое?
 
-- ✅ Полный AI-аудит сайтов через OpenRouter AI (приоритет)
-- ✅ Автоматический fallback на Google AI при недоступности OpenRouter
-- ✅ Анализ URL, TLS сертификатов, DNS информации, возраста домена
-- ✅ Проверка HTML/JS структуры, контента и опасного поведения
-- ✅ Базовая проверка по blacklist/whitelist правилам
-- ✅ Понятные результаты на русском языке простыми словами
+**Link Scanner** помогает определить, безопасна ли ссылка перед переходом по ней. Это особенно полезно для:
+
+- **Защиты от фишинга** — обнаружение поддельных сайтов, имитирующих банки, соцсети и другие сервисы
+- **Проверки подозрительных ссылок** — анализ URL из email, сообщений, объявлений
+- **Оценки репутации домена** — проверка возраста домена, SSL сертификатов, DNS записей
+- **Анализа содержимого** — проверка HTML/JS кода на наличие опасных паттернов
+
+## ✨ Основные возможности
+
+- 🤖 **AI-анализ** — использование OpenRouter AI (приоритет) и Google AI (fallback) для детального анализа
+- 🔍 **Многоуровневая проверка**:
+  - Анализ URL структуры (подозрительные символы, маскировка)
+  - Проверка TLS/SSL сертификатов
+  - Анализ DNS записей и возраста домена
+  - Проверка HTML/JavaScript содержимого
+  - Сравнение с базами официальных источников
+- 📊 **Понятные результаты** — вердикт простыми словами на русском языке
+- ⚡ **Автоматический fallback** — при недоступности одного AI провайдера автоматически переключается на другой
+- 🛡️ **Базовая защита** — проверка по blacklist/whitelist правилам
+
+## 🏗️ Как это работает?
+
+### Архитектура системы
+
+```
+┌─────────────────┐
+│  Пользователь   │
+│  (Браузер)      │
+└────────┬────────┘
+         │ HTTP Request
+         ▼
+┌─────────────────┐
+│  Laravel App    │
+│  (PHP)          │
+│  - Routes       │
+│  - Controller   │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ PhishGuardService│
+│  (PHP Service)  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Python Scripts  │
+│ - phishguard_   │
+│   audit.py      │
+│ - ai_analyzer.py│
+│ - domain_info.py│
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  AI Providers    │
+│  - OpenRouter    │
+│  - Google AI     │
+└─────────────────┘
+```
+
+### Процесс проверки ссылки
+
+1. **Ввод URL** — пользователь вводит ссылку в форму на веб-странице
+
+2. **Базовая проверка** (мгновенно):
+   - Проверка по whitelist (доверенные домены)
+   - Проверка по blacklist (известные опасные домены)
+   - Анализ структуры URL (подозрительные паттерны)
+
+3. **Сбор данных** (если не в whitelist):
+   - Загрузка HTML содержимого страницы
+   - Извлечение JavaScript файлов
+   - Получение DNS информации
+   - Проверка TLS/SSL сертификата
+   - Определение возраста домена
+
+4. **AI-анализ**:
+   - Отправка собранных данных в OpenRouter AI
+   - Если OpenRouter недоступен → автоматический переход на Google AI
+   - AI анализирует все аспекты и выдает вердикт
+
+5. **Классификация**:
+   - **Безопасно** (зеленый) — сайт безопасен для посещения
+   - **Подозрительно** (желтый) — есть некоторые признаки риска
+   - **Опасно** (красный) — высокий риск фишинга/мошенничества
+
+6. **Отображение результатов**:
+   - Вердикт с цветовой индикацией
+   - Вероятность фишинга (0-100%)
+   - Детальное объяснение простыми словами
+   - Разбивка по категориям анализа
 
 ## 📋 Требования
 
@@ -24,8 +110,8 @@
 ### 1. Клонирование репозитория
 
 ```bash
-git clone https://github.com/NURJAKS/Gos-project.git
-cd Gos-project
+git clone https://github.com/NURJAKS/Link-Scanner.git
+cd Link-Scanner
 ```
 
 ### 2. Установка PHP зависимостей
@@ -36,10 +122,26 @@ composer install
 
 ### 3. Настройка окружения
 
-Файл `.env` уже включен в репозиторий с необходимыми ключами. Если нужно сгенерировать новый APP_KEY:
+Скопируйте файл `.env.example` в `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Сгенерируйте APP_KEY:
 
 ```bash
 php artisan key:generate
+```
+
+**Важно**: Откройте файл `.env` и добавьте ваши API ключи:
+
+```env
+# OpenRouter AI API Key (получите на https://openrouter.ai/keys)
+OPENROUTER_API_KEY=ваш_ключ_openrouter
+
+# Google AI API Key (fallback, получите на https://aistudio.google.com/apikey)
+GOOGLE_API_KEY=ваш_ключ_google_ai
 ```
 
 ### 4. Установка Node.js зависимостей
@@ -72,6 +174,13 @@ pip install -r python_scripts/requirements.txt
 chmod +x python_scripts/phishguard_audit.py
 ```
 
+### 7. Создание базы данных (опционально)
+
+```bash
+touch database/database.sqlite
+php artisan migrate
+```
+
 ## ▶️ Запуск проекта
 
 ### Запуск Laravel сервера
@@ -82,59 +191,38 @@ php artisan serve --host=0.0.0.0 --port=8003
 
 ### Доступ к приложению
 
-Откройте в браузере: `http://localhost:8003`
+Откройте в браузере: **http://localhost:8003**
 
-### Проверка ссылок
+### Использование
 
 1. Перейдите на страницу: `http://localhost:8003/check/link`
-2. Введите URL или домен для проверки
+2. Введите URL или домен для проверки (например: `https://example.com`)
 3. Нажмите "Проверить ссылку"
-4. Дождитесь результатов анализа
+4. Дождитесь результатов анализа (обычно 5-15 секунд)
 
-## 🔧 Как это работает
+## 🔑 Получение API ключей
 
-### Архитектура
+### OpenRouter AI (рекомендуется)
 
-```
-Laravel Frontend (PHP)
-    ↓
-CheckController::checkLink()
-    ↓
-PhishGuardService::fullAudit()
-    ↓
-Python Script: python_scripts/phishguard_audit.py
-    ↓
-ai_analyzer.py::analyze_url_full_audit()
-    ↓
-OpenRouter AI API (Primary) → Google AI (Fallback)
-```
+1. Зарегистрируйтесь на [https://openrouter.ai](https://openrouter.ai)
+2. Перейдите в [Keys](https://openrouter.ai/keys)
+3. Создайте новый API ключ
+4. Скопируйте ключ в `.env` файл
 
-### Процесс проверки
+**Бесплатная модель**: `xiaomi/mimo-v2-flash:free` (уже настроена по умолчанию)
 
-1. **Сбор данных**:
-   - Загрузка HTML страницы
-   - Извлечение JavaScript URL
-   - Анализ домена (DNS, TLS, возраст)
+### Google AI (fallback)
 
-2. **AI-анализ**:
-   - Отправка данных в OpenRouter AI (приоритет)
-   - Если OpenRouter недоступен (401, 503, 429) → автоматический переход на Google AI
-   - Анализ всех аспектов безопасности
+1. Перейдите на [Google AI Studio](https://aistudio.google.com/apikey)
+2. Создайте новый API ключ
+3. Скопируйте ключ в `.env` файл
 
-3. **Классификация**:
-   - Безопасно / Подозрительно / Опасно
-   - Вероятность фишинга (0-100%)
-   - Детальное объяснение простыми словами
-
-4. **Результат**:
-   - Отображение в удобном формате
-   - Детальный анализ по категориям
-   - Рекомендации по безопасности
+**Лимит**: 20 запросов/день для бесплатного тарифа
 
 ## 📁 Структура проекта
 
 ```
-Gos-project/
+Link-Scanner/
 ├── app/
 │   ├── Http/Controllers/
 │   │   └── CheckController.php          # Контроллер проверки ссылок
@@ -151,103 +239,37 @@ Gos-project/
 │   ├── check/
 │   │   └── link.blade.php               # Frontend страница проверки ссылок
 │   └── layouts/
-│       └── app.blade.php                 # Основной layout
+│       └── app.blade.php                # Основной layout
 ├── routes/
 │   └── web.php                          # Маршруты (GET/POST /check/link)
 ├── config/
 │   └── services.php                     # Конфигурация API ключей
-└── .env                                  # Переменные окружения (включен в репозиторий)
+└── .env.example                         # Пример файла окружения
 ```
 
-## 🔑 API Ключи
+## 🔧 Технические детали
 
-Все ключи уже настроены в `.env` файле:
+### Используемые технологии
 
-- **OPENROUTER_API_KEY**: `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`
-- **OPENROUTER_MODEL**: `xiaomi/mimo-v2-flash:free` (бесплатная модель)
-- **GOOGLE_API_KEY**: `AIzaSyBFvQQz_PQdg4jTpwefpfPuiAyV7OMT9aw` (fallback)
+- **Backend**: Laravel 12.x (PHP 8.2+)
+- **Frontend**: Blade templates, CSS
+- **AI**: OpenRouter API (приоритет), Google Gemini (fallback)
+- **Python**: requests, beautifulsoup4, google-genai, dnspython
 
-> ⚠️ **Важно**: Если OpenRouter ключ недействителен (401), система автоматически переключится на Google AI.
+### Автоматический Fallback
 
-## 🔌 Интеграция в существующий проект
+Система автоматически переключается между AI провайдерами:
 
-Если вы хотите интегрировать этот модуль проверки ссылок в свой существующий Laravel проект:
+1. **OpenRouter** (приоритет) — если доступен
+2. **Google AI** (fallback) — если OpenRouter недоступен (401, 503, 429)
+3. **Базовая проверка** (blacklist/whitelist) — если оба AI недоступны
 
-### 1. Скопируйте файлы
+### Лимиты API
 
-```bash
-# Сервис
-cp app/Services/PhishGuardService.php <your-project>/app/Services/
+- **OpenRouter**: Бесплатная модель имеет лимиты на количество запросов
+- **Google AI**: 20 запросов/день для бесплатного тарифа
 
-# Контроллер (или добавьте методы link() и checkLink() в существующий)
-cp app/Http/Controllers/CheckController.php <your-project>/app/Http/Controllers/
-
-# Python скрипты
-cp -r python_scripts/ <your-project>/
-
-# View
-cp resources/views/check/link.blade.php <your-project>/resources/views/check/
-cp resources/views/layouts/app.blade.php <your-project>/resources/views/layouts/
-```
-
-### 2. Добавьте маршруты
-
-В `routes/web.php`:
-
-```php
-use App\Http\Controllers\CheckController;
-
-Route::get('/check/link', [CheckController::class, 'link'])->name('check.link');
-Route::post('/check/link', [CheckController::class, 'checkLink'])->name('check.link.perform');
-```
-
-### 3. Установите Python зависимости
-
-```bash
-pip install -r python_scripts/requirements.txt
-```
-
-### 4. Настройте .env
-
-Добавьте в ваш `.env`:
-
-```env
-OPENROUTER_API_KEY=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
-OPENROUTER_MODEL=xiaomi/mimo-v2-flash:free
-GOOGLE_API_KEY=AIzaSyBFvQQz_PQdg4jTpwefpfPuiAyV7OMT9aw
-```
-
-### 5. Обновите config/services.php
-
-Добавьте секцию:
-
-```php
-'openrouter' => [
-    'key' => env('OPENROUTER_API_KEY', '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'),
-    'api_key' => env('OPENROUTER_API_KEY', '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'),
-],
-```
-
-### 6. Права доступа
-
-```bash
-chmod +x python_scripts/phishguard_audit.py
-```
-
-### 7. Очистка кеша
-
-```bash
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-```
-
-## ✅ Проверка работы
-
-1. Запустите сервер: `php artisan serve --port=8003`
-2. Откройте: `http://localhost:8003/check/link`
-3. Введите URL и нажмите "Проверить ссылку"
-4. Дождитесь результатов
+При исчерпании лимитов система автоматически переключается на fallback или показывает понятное сообщение об ошибке.
 
 ## 🧪 Тестирование
 
@@ -258,7 +280,7 @@ php artisan view:clear
 source venv/bin/activate
 
 # Прямой вызов Python скрипта
-python3 python_scripts/phishguard_audit.py "https://google.com" "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"
+python3 python_scripts/phishguard_audit.py "https://google.com" "ваш_openrouter_ключ" "ваш_google_ключ"
 ```
 
 ### Тест через Laravel Tinker
@@ -269,26 +291,6 @@ php artisan tinker
 $service = app(\App\Services\PhishGuardService::class);
 $result = $service->fullAudit('https://google.com');
 print_r($result);
-```
-
-## 📝 Конфигурация
-
-### Изменение модели AI
-
-В `.env` измените:
-
-```env
-OPENROUTER_MODEL=xiaomi/mimo-v2-flash:free
-```
-
-Доступные бесплатные модели можно посмотреть на: https://openrouter.ai/models
-
-### Изменение порта
-
-В `.env`:
-
-```env
-APP_PORT=8003
 ```
 
 ## 🐛 Решение проблем
@@ -328,33 +330,44 @@ pip install -r python_scripts/requirements.txt
 
 Проверьте путь к Python в `PhishGuardService.php`. По умолчанию используется `python3` или `venv/bin/python3`.
 
-## 📚 Дополнительная информация
+## 📝 Конфигурация
 
-### Используемые технологии
+### Изменение модели AI
 
-- **Backend**: Laravel 12.x (PHP 8.2+)
-- **Frontend**: Blade templates, TailwindCSS
-- **AI**: OpenRouter API (приоритет), Google Gemini (fallback)
-- **Python**: requests, beautifulsoup4, google-genai, dnspython
+В `.env` измените:
 
-### Лимиты API
+```env
+OPENROUTER_MODEL=xiaomi/mimo-v2-flash:free
+```
 
-- **OpenRouter**: Бесплатная модель `xiaomi/mimo-v2-flash:free` имеет лимиты на количество запросов
-- **Google AI**: 20 запросов/день для бесплатного тарифа
+Доступные бесплатные модели можно посмотреть на: [https://openrouter.ai/models](https://openrouter.ai/models)
 
-При исчерпании лимитов или ошибках (401, 503, 429) система автоматически переключается на fallback или показывает понятное сообщение об ошибке.
+### Изменение порта
 
-### Автоматический Fallback
+В `.env`:
 
-Система автоматически переключается между AI провайдерами:
-1. **OpenRouter** (приоритет) - если доступен
-2. **Google AI** (fallback) - если OpenRouter недоступен (401, 503, 429)
-3. **Базовая проверка** (blacklist/whitelist) - если оба AI недоступны
+```env
+APP_PORT=8003
+```
+
+## 🔌 Интеграция в существующий проект
+
+Если вы хотите интегрировать этот модуль проверки ссылок в свой существующий Laravel проект, см. раздел "Интеграция" в документации или скопируйте необходимые файлы:
+
+- `app/Services/PhishGuardService.php`
+- `app/Http/Controllers/CheckController.php` (методы `link()` и `checkLink()`)
+- `python_scripts/` (вся папка)
+- `resources/views/check/link.blade.php`
+- `resources/views/layouts/app.blade.php`
 
 ## 📄 Лицензия
 
 MIT License
 
+## 👥 Авторы
+
+Этот проект разработан для защиты пользователей от фишинга и мошеннических сайтов.
+
 ---
 
-**Сканер ссылок на безопасность** - минималистичный инструмент для проверки безопасности URL с использованием AI.
+**Link Scanner** — простой и эффективный способ проверить безопасность любой ссылки перед переходом по ней.

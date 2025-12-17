@@ -14,16 +14,16 @@
     </p>
 
     <ul style="list-style: none; padding: 0; margin: 0 0 2rem 0; color: var(--text-muted); font-size: 0.9rem;">
-        <li>1. Нажмите кнопку ниже, чтобы вернуться к форме проверки изображений.</li>
-        <li>2. Загрузите файлы заново и повторите проверку.</li>
+        <li>1. Нажмите кнопку ниже, чтобы вернуться к форме проверки ссылок.</li>
+        <li>2. Введите ссылку заново и повторите проверку.</li>
     </ul>
 
     <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-        <a href="{{ route('check.image') }}" class="btn" style="padding: 0.75rem 1.5rem; background: var(--success); color: #fff; text-decoration: none; border-radius: 4px; font-weight: 600;">
-            ⤺ Вернуться к проверке изображений
+        <a href="{{ route('check.link') }}" class="btn" style="padding: 0.75rem 1.5rem; background: var(--success); color: #fff; text-decoration: none; border-radius: 4px; font-weight: 600;">
+            ⤺ Вернуться к проверке ссылок
         </a>
-        <a href="{{ route('dashboard') }}" class="btn" style="padding: 0.75rem 1.5rem; background: var(--bg-card); color: var(--text-main); text-decoration: none; border-radius: 4px; border: 1px solid var(--border); font-weight: 600;">
-            ⌂ На главную панель
+        <a href="{{ route('home') }}" class="btn" style="padding: 0.75rem 1.5rem; background: var(--bg-card); color: var(--text-main); text-decoration: none; border-radius: 4px; border: 1px solid var(--border); font-weight: 600;">
+            ⌂ На главную
         </a>
     </div>
 
