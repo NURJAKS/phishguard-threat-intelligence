@@ -1,10 +1,9 @@
-# AntiFraud Platform - Link Check Module
+# 🔒 Сканер ссылок на безопасность
 
-Модуль проверки ссылок с использованием AI (OpenRouter + Google AI) для определения фишинговых и мошеннических сайтов.
+Минималистичный инструмент для проверки безопасности ссылок с использованием AI (OpenRouter + Google AI).
 
-## 🎯 Основная функциональность
+## 🎯 Функциональность
 
-**Проверка ссылок (Link Check)** - главная функция проекта:
 - ✅ Полный AI-аудит сайтов через OpenRouter AI (приоритет)
 - ✅ Автоматический fallback на Google AI при недоступности OpenRouter
 - ✅ Анализ URL, TLS сертификатов, DNS информации, возраста домена
@@ -81,12 +80,6 @@ chmod +x python_scripts/phishguard_audit.py
 php artisan serve --host=0.0.0.0 --port=8003
 ```
 
-Или используйте встроенный скрипт:
-
-```bash
-composer run dev
-```
-
 ### Доступ к приложению
 
 Откройте в браузере: `http://localhost:8003`
@@ -138,7 +131,7 @@ OpenRouter AI API (Primary) → Google AI (Fallback)
    - Детальный анализ по категориям
    - Рекомендации по безопасности
 
-## 📁 Структура проекта (важные файлы)
+## 📁 Структура проекта
 
 ```
 Gos-project/
@@ -152,10 +145,13 @@ Gos-project/
 │   ├── ai_analyzer.py                   # AI анализ через OpenRouter/Google
 │   ├── domain_info.py                   # Анализ домена (DNS, TLS, возраст)
 │   ├── rules.json                       # Правила blacklist/whitelist
-│   ├── official_sources.json             # База официальных источников
+│   ├── official_sources.json            # База официальных источников
 │   └── requirements.txt                 # Python зависимости
-├── resources/views/check/
-│   └── link.blade.php                   # Frontend страница проверки ссылок
+├── resources/views/
+│   ├── check/
+│   │   └── link.blade.php               # Frontend страница проверки ссылок
+│   └── layouts/
+│       └── app.blade.php                 # Основной layout
 ├── routes/
 │   └── web.php                          # Маршруты (GET/POST /check/link)
 ├── config/
@@ -183,18 +179,15 @@ Gos-project/
 # Сервис
 cp app/Services/PhishGuardService.php <your-project>/app/Services/
 
-# Контроллер (или добавьте метод checkLink в существующий)
+# Контроллер (или добавьте методы link() и checkLink() в существующий)
 cp app/Http/Controllers/CheckController.php <your-project>/app/Http/Controllers/
-# Метод: checkLink() - строки ~376-566
 
 # Python скрипты
 cp -r python_scripts/ <your-project>/
 
 # View
 cp resources/views/check/link.blade.php <your-project>/resources/views/check/
-
-# Конфигурация
-# Добавьте в config/services.php секцию 'openrouter'
+cp resources/views/layouts/app.blade.php <your-project>/resources/views/layouts/
 ```
 
 ### 2. Добавьте маршруты
@@ -362,10 +355,6 @@ pip install -r python_scripts/requirements.txt
 
 MIT License
 
-## 👥 Авторы
-
-Этот модуль проверки ссылок был разработан для интеграции в основной проект AntiFraud Platform.
-
 ---
 
-**Важно**: Этот проект сфокусирован на функции проверки ссылок. Другие функции (проверка номеров, изображений и т.д.) могут быть в основном проекте.
+**Сканер ссылок на безопасность** - минималистичный инструмент для проверки безопасности URL с использованием AI.

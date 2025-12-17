@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AntiFraud Platform</title>
+    <title>Сканер ссылок на безопасность</title>
     <style>
         :root {
             /* Cybersec Palette */
@@ -32,7 +32,7 @@
         }
 
         *, *::before, *::after {
-            box-sizing: border-box; /* Critical for 100% width layouts */
+            box-sizing: border-box;
         }
 
         body {
@@ -43,7 +43,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden; /* Prevent accidental horizontal scroll */
+            overflow-x: hidden;
         }
 
         header {
@@ -57,9 +57,9 @@
 
         .container {
             width: 100%;
-            max-width: 100%;
-            margin: 0;
-            padding: 0 1rem; /* "Reduces the edge" - smaller padding */
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
         }
 
         .nav-flex {
@@ -70,48 +70,12 @@
 
         .brand {
             font-family: var(--font-mono);
-            font-size: 1.1rem; /* Slightly smaller/compact */
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--success);
             text-decoration: none;
             letter-spacing: -0.5px;
             text-transform: uppercase;
-            margin-right: 2rem;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            padding: 0.75rem 1.25rem; /* ~2x larger padding */
-            font-size: 0.9rem; /* Larger font */
-            font-weight: 700;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background-color: rgba(255, 255, 255, 0.03);
-            border: 1px solid transparent;
-            border-radius: 4px;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .nav-links a:hover {
-            background-color: rgba(34, 197, 94, 0.1);
-            color: var(--success);
-            border-color: rgba(34, 197, 94, 0.2);
-        }
-
-        .nav-links a.active {
-            background-color: var(--success);
-            color: #000000;
-            border-color: var(--success);
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
         }
 
         main {
@@ -124,7 +88,7 @@
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             padding: 1.5rem;
-            box-shadow: none; /* Flat look */
+            box-shadow: none;
         }
 
         h1, h2, h3, h4, h5, h6 {
@@ -139,42 +103,31 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--success); /* Green by default */
+            background-color: var(--success);
             color: #000000;
-            height: 38px; /* Fixed, professional height */
+            height: 38px;
             padding: 0 1.5rem;
-            border-radius: 2px; /* Sharp, technical corners */
+            border-radius: 2px;
             text-decoration: none;
             font-weight: 700;
-            border: 1px solid var(--success); /* Border matching bg */
+            border: 1px solid var(--success);
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: var(--font-mono);
             text-transform: uppercase;
-            font-size: 0.75rem; /* Crisper text */
+            font-size: 0.75rem;
             letter-spacing: 1px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
 
         .btn:hover {
-            background-color: #16a34a; /* Darker green */
+            background-color: #16a34a;
             border-color: #16a34a;
             transform: translateY(-1px);
         }
         
         .btn:active {
             transform: translateY(0);
-        }
-        
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-        }
-        
-        .btn-outline:hover {
-            border-color: var(--text-main);
-            color: var(--text-main);
         }
 
         .form-group {
@@ -211,11 +164,6 @@
 
         .alert { padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid transparent; }
         .alert-error { background-color: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5; }
-
-        table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.875rem; }
-        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-        th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
-        tr:hover td { background-color: var(--bg-input); }
         
         /* Utility classes */
         .text-success { color: var(--success); }
@@ -249,19 +197,7 @@
 <body>
     <header>
         <div class="container nav-flex">
-            <a href="/" class="brand">ANTIFRAUD.KZ</a>
-            <nav class="nav-links">
-                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">🏠 Dashboard</a>
-                <a href="{{ route('check.phone') }}" class="{{ request()->routeIs('check.phone') ? 'active' : '' }}">📞 Проверка номера</a>
-                <a href="{{ route('check.listing') }}" class="{{ request()->routeIs('check.listing') ? 'active' : '' }}">🔗 Проверка объявления</a>
-                <a href="{{ route('check.image') }}" class="{{ request()->routeIs('check.image') ? 'active' : '' }}">🖼 Проверка изображений</a>
-                <a href="{{ route('check.link') }}" class="{{ request()->routeIs('check.link') ? 'active' : '' }}">🌐 Проверка ссылки</a>
-                <a href="{{ route('connections') }}" class="{{ request()->routeIs('connections') ? 'active' : '' }}">🔗 Связи</a>
-                <a href="{{ route('profile') }}" class="{{ request()->routeIs('profile') ? 'active' : '' }}">👤 Профиль продавца</a>
-                <a href="{{ route('analytics') }}" class="{{ request()->routeIs('analytics') ? 'active' : '' }}">📊 Аналитика</a>
-                <a href="{{ route('check.history') }}" class="{{ request()->routeIs('check.history') ? 'active' : '' }}">🕒 История</a>
-                <a href="{{ route('settings') }}" class="{{ request()->routeIs('settings') ? 'active' : '' }}">⚙️ Настройки</a>
-            </nav>
+            <a href="/" class="brand">🔒 Сканер ссылок</a>
         </div>
     </header>
     <main>
@@ -270,7 +206,7 @@
         </div>
     </main>
     <footer>
-        &copy; {{ date('Y') }} AntiFraud Platform. Secure & Reliable.
+        &copy; {{ date('Y') }} Сканер ссылок на безопасность. Powered by AI.
     </footer>
 </body>
 </html>
