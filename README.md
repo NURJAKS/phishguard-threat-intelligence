@@ -44,14 +44,8 @@
          │
          ▼
 ┌─────────────────┐
-│ PhishGuardService│
-│  (PHP Service)  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
 │ Python Scripts  │
-│ - phishguard_   │
+│                 │
 │   audit.py      │
 │ - ai_analyzer.py│
 │ - domain_info.py│
@@ -193,6 +187,12 @@ php artisan serve --host=0.0.0.0 --port=8003
 
 Откройте в браузере: **http://localhost:8003**
 
+<img width="1317" height="936" alt="Screenshot from 2025-12-17 08-06-52" src="https://github.com/user-attachments/assets/f6ef56f3-616c-47cd-bc27-b1122a6f4507" />
+
+<img width="1317" height="936" alt="Screenshot from 2025-12-17 08-07-11" src="https://github.com/user-attachments/assets/cea8fedf-278b-424e-a938-92f3f7230bef" />
+
+
+
 ### Использование
 
 1. Перейдите на страницу: `http://localhost:8003/check/link`
@@ -229,7 +229,7 @@ Link-Scanner/
 │   └── Services/
 │       └── PhishGuardService.php        # Сервис для работы с PhishGuard
 ├── python_scripts/
-│   ├── phishguard_audit.py              # Главный скрипт для вызова из PHP
+│       
 │   ├── ai_analyzer.py                   # AI анализ через OpenRouter/Google
 │   ├── domain_info.py                   # Анализ домена (DNS, TLS, возраст)
 │   ├── rules.json                       # Правила blacklist/whitelist
@@ -271,27 +271,8 @@ Link-Scanner/
 
 При исчерпании лимитов система автоматически переключается на fallback или показывает понятное сообщение об ошибке.
 
-## 🧪 Тестирование
 
-### Тест через командную строку
 
-```bash
-# Активация виртуального окружения
-source venv/bin/activate
-
-# Прямой вызов Python скрипта
-python3 python_scripts/phishguard_audit.py "https://google.com" "ваш_openrouter_ключ" "ваш_google_ключ"
-```
-
-### Тест через Laravel Tinker
-
-```bash
-php artisan tinker
-
-$service = app(\App\Services\PhishGuardService::class);
-$result = $service->fullAudit('https://google.com');
-print_r($result);
-```
 
 ## 🐛 Решение проблем
 
@@ -326,9 +307,6 @@ source venv/bin/activate
 pip install -r python_scripts/requirements.txt
 ```
 
-### Python скрипт не выполняется
-
-Проверьте путь к Python в `PhishGuardService.php`. По умолчанию используется `python3` или `venv/bin/python3`.
 
 ## 📝 Конфигурация
 
@@ -354,7 +332,6 @@ APP_PORT=8003
 
 Если вы хотите интегрировать этот модуль проверки ссылок в свой существующий Laravel проект, см. раздел "Интеграция" в документации или скопируйте необходимые файлы:
 
-- `app/Services/PhishGuardService.php`
 - `app/Http/Controllers/CheckController.php` (методы `link()` и `checkLink()`)
 - `python_scripts/` (вся папка)
 - `resources/views/check/link.blade.php`
