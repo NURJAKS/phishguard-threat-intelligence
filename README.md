@@ -2,6 +2,7 @@
 
 > **AI-powered hybrid URL threat intelligence and anti-phishing inspection platform combining deterministic lexical analysis, domain registration telemetry (WHOIS/SSL), and multi-LLM automated security triage with cascade fallback.**
 
+[![CI](https://github.com/NURJAKS/phishguard-threat-intelligence/actions/workflows/ci.yml/badge.svg)](https://github.com/NURJAKS/phishguard-threat-intelligence/actions/workflows/ci.yml)
 [![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-11.0+-FF2D20?logo=laravel&logoColor=white)](https://laravel.com/)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
